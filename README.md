@@ -3,7 +3,7 @@ Created and maintained by @surbhipsychtutor 💻📘
 
 This aims to make psychology fun, visual, and easier to understand through gamified, interactive experiences. 🖥️ Web-based – runs on any browser!
 
-📺 Watch & Learn Check out video on my YouTube channel: 🎥 SurbhiPsychTutor – YouTube
+📺 Watch & Learn Check out video on my YouTube channel: 🎥 surbhipsychtutor – YouTube
 
 📜 License & Usage Policy All content in this repository, including code, visuals, and ideas, is copyrighted and owned by Surbhi Sharma. 🔒 This repository and its contents are:
 
