@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Habit Builder — Stress Reduction</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* Theme variables for dark and light. We switch theme by adding .light-theme to body */
+:root {
+    --dark-bg: #0b0f1a;
+    --light-bg: #ffffff;
+    --neon-cyan: #00ffff;
+    --neon-purple: #8a2be2;
+    --text-color-dark: #f0f0f0;
+    --text-color-light: #0b0f1a;
+    --border-color-dark: rgba(255, 255, 255, 0.1);
+    --border-color-light: rgba(0,0,0,0.08);
+    --card-dark: rgba(11, 15, 26, 0.8);
+    --card-light: rgba(255,255,255,0.92);
+    --checkbox-check-color-dark: #0b0f1a;
+    --checkbox-check-color-light: #ffffff;
+}
+
+/* Base resets */
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+    background-color: var(--dark-bg);
+    color: var(--text-color-dark);
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 20px;
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Light theme overrides */
+body.light-theme {
+    background-color: var(--light-bg);
+    color: var(--text-color-light);
+}
+
+/* Layout */
+.header-container {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 15px;
+}
+.header-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.container {
+    max-width: 1200px;
+    width: 100%;
+    display: grid;
+    gap: 30px;
+    grid-template-columns: 1fr;
+}
+@media (min-width: 768px) {
+    .container {
+        grid-template-columns: 1fr 1fr;
+        align-items: start;
+    }
+    .custom-habit-section {
+        grid-column: span 2;
+    }
+}
+
+/* Neon headings: we tone down neon in light mode to remain readable */
+.neon-heading, .neon-subheading {
+    text-align: center;
+    margin: 0;
+}
+.neon-heading {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-color-dark);
+    text-shadow: 0 0 5px var(--neon-cyan), 0 0 10px var(--neon-cyan),
+                 0 0 20px var(--neon-purple), 0 0 40px var(--neon-purple);
+}
+.neon-subheading {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: var(--text-color-dark);
+    text-shadow: 0 0 4px rgba(0,0,0,0.25);
+}
+
+/* Light theme heading adjustments (reduce neon to keep legibility) */
+body.light-theme .neon-heading,
+body.light-theme .neon-subheading {
+    color: var(--text-color-light);
+    text-shadow: 0 0 3px rgba(0,0,0,0.06);
+}
+
+/* Cards */
+.habit-section {
+    background: var(--card-dark);
+    border: 2px solid var(--border-color-dark);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.09);
+    transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+}
+body.light-theme .habit-section {
+    background: var(--card-light);
+    border: 2px solid var(--border-color-light);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+}
+
+/* Habit list */
+.habit-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 400px;
+    overflow-y: auto;
+    margin-top: 15px;
+    padding-right: 10px;
+}
+.controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
+    align-items: center;
+}
+
+/* Habit item */
+.habit-item {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.12s;
+    gap: 10px;
+}
+.habit-item:hover { transform: translateY(-2px); }
+
+/* Light-mode habit item contrast */
+body.light-theme .habit-item {
+    background: rgba(0,0,0,0.03);
+    border: 1px solid rgba(0,0,0,0.06);
+}
+
+/* Custom checkbox style -- adapts with theme */
+.habit-item input[type="checkbox"] {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--neon-cyan);
+    border-radius: 5px;
+    cursor: pointer;
+    position: relative;
+    transition: border-color 0.25s, box-shadow 0.25s, background-color 0.25s;
+    display: inline-block;
+    background: transparent;
+}
+.habit-item input[type="checkbox"]:checked {
+    background-color: var(--neon-cyan);
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 5px var(--neon-cyan), 0 0 10px var(--neon-cyan);
+}
+.habit-item input[type="checkbox"]:checked::after {
+    content: '✔';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--checkbox-check-color-dark);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+/* When in light theme, ensure the checkmark contrasts */
+body.light-theme .habit-item input[type="checkbox"]:checked::after {
+    color: var(--checkbox-check-color-light);
+}
+
+/* Buttons */
+.neon-button {
+    background: transparent;
+    color: inherit;
+    border: 2px solid var(--neon-cyan);
+    border-radius: 50px;
+    padding: 10px 18px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 0 5px var(--neon-cyan), 0 0 10px var(--neon-cyan);
+    transition: transform 0.18s ease-in-out, box-shadow 0.18s, opacity 0.2s;
+}
+.neon-button:hover {
+    transform: scale(1.03);
+    box-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-purple);
+}
+
+/* In light theme reduce neon prominence so text remains readable */
+body.light-theme .neon-button {
+    box-shadow: 0 0 6px rgba(0,0,0,0.06);
+    border-color: rgba(0,0,0,0.12);
+}
+
+/* Inputs */
+input[type="text"] {
+    flex: 1;
+    min-width: 150px;
+    padding: 10px;
+    border: 1px solid var(--border-color-dark);
+    background: rgba(255, 255, 255, 0.04);
+    color: inherit;
+    border-radius: 10px;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+/* Light theme input adjustments */
+body.light-theme input[type="text"] {
+    border: 1px solid var(--border-color-light);
+    background: rgba(0,0,0,0.02);
+}
+
+/* Daily tip card */
+#daily-tip-card {
+    background: rgba(138, 43, 226, 0.12);
+    border: 2px solid var(--neon-purple);
+    border-radius: 15px;
+    padding: 16px;
+    text-align: center;
+    margin-bottom: 12px;
+    display: none;
+    animation: fadeIn 0.4s ease-in-out;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Preview content */
+.preview-content {
+    display: none;
+    margin-top: 10px;
+    padding: 18px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 10px;
+}
+.preview-content h3, .preview-content h4 {
+    color: var(--neon-cyan);
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    margin-top: 20px;
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 0.9rem;
+}
+
+/* PDF export helper styles (these are applied only to the temporary node used for html2pdf) */
+.pdf-export {
+    background: #fff !important;
+    color: #000 !important;
+    padding: 24px;
+    font-family: 'Poppins', sans-serif;
+    line-height: 1.4;
+}
+.pdf-export h3 { color: #000 !important; }
+.pdf-export h4 { color: #000 !important; }
+
+/* Small responsive tweaks */
+@media (max-width: 480px) {
+    .neon-heading { font-size: 1.8rem; }
+    .neon-subheading { font-size: 1rem; }
+}
+</style>
+</head>
+<body>
+<header class="header-container">
+    <h1 class="neon-heading">Habit Builder</h1>
+    <p class="neon-subheading">Stress Reduction</p>
+    <div class="header-actions">
+        <button class="neon-button" id="preview-button">Preview Plan</button>
+        <button class="neon-button" id="export-button">Export as PDF</button>
+        <button class="neon-button" id="theme-toggle">Toggle Theme</button>
+    </div>
+    <div id="preview-content" class="preview-content" aria-live="polite"></div>
+</header>
+
+<main class="container">
+    <section class="habit-section">
+        <h2 class="neon-heading">Unhelpful Habits</h2>
+        <div class="controls">
+            <input type="text" id="unhelpful-search" placeholder="Search unhelpful habits..." autocomplete="off">
+            <button class="neon-button" id="select-all-unhelpful">Select All</button>
+            <button class="neon-button" id="clear-all-unhelpful">Clear All</button>
+        </div>
+        <div class="habit-list" id="unhelpful-habits-list" role="list"></div>
+        <div id="unhelpful-suggestions">
+            <h3>Recommended Replacement Techniques</h3>
+            <div class="suggestions-container"></div>
+        </div>
+    </section>
+
+    <section class="habit-section">
+        <h2 class="neon-heading">Helpful Habits</h2>
+        <div id="daily-tip-card">
+            <h4>Your Daily Stress Reduction Tip</h4>
+            <p id="daily-tip-text"></p>
+        </div>
+        <div class="controls">
+            <input type="text" id="helpful-search" placeholder="Search helpful habits..." autocomplete="off">
+            <button class="neon-button" id="daily-tip-button">Show Daily Tip</button>
+        </div>
+        <div class="habit-list" id="helpful-habits-list" role="list"></div>
+    </section>
+
+    <section class="habit-section custom-habit-section">
+        <h2 class="neon-heading">Create a Custom Habit</h2>
+        <input type="text" id="custom-habit-input" placeholder="Enter your custom habit..." autocomplete="off">
+        <div style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap;">
+            <button class="neon-button" id="add-to-unhelpful">Add to Unhelpful</button>
+            <button class="neon-button" id="add-to-helpful">Add to Helpful</button>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <p>© 2025 @surbhipsychtutor</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+<script>
+/* --- Data (unchanged content) --- */
+const unhelpfulHabitsData = [
+    { id: 1, name: 'Procrastinating on tasks', featured: true, techniques: [{ name: 'Break tasks into smaller steps', type: 'Behavioral' }, { name: 'Use the Pomodoro Technique', type: 'Time Management' }] },
+    { id: 2, name: 'Excessive social media scrolling', featured: true, techniques: [{ name: 'Set app timers', type: 'Digital Well-being' }, { name: 'Designate "no-phone" zones', type: 'Behavioral' }] },
+    { id: 3, name: 'Negative self-talk', featured: true, techniques: [{ name: 'Practice gratitude journaling', type: 'Cognitive' }, { name: 'Use positive affirmations', type: 'Cognitive' }] },
+    { id: 4, name: 'Drinking too much coffee', featured: false, techniques: [{ name: 'Replace with herbal tea', type: 'Behavioral' }, { name: 'Limit to one cup a day', type: 'Moderation' }] },
+    { id: 5, name: 'Skipping meals', featured: false, techniques: [{ name: 'Set meal reminders', type: 'Behavioral' }, { name: 'Prepare simple snacks in advance', type: 'Planning' }] },
+    { id: 6, name: 'Isolating from friends and family', featured: false, techniques: [{ name: 'Schedule one social call per week', type: 'Social' }, { name: 'Join a local club or group', type: 'Community' }] },
+    { id: 7, name: 'Staying up late and losing sleep', featured: true, techniques: [{ name: 'Establish a consistent bedtime routine', type: 'Behavioral' }, { name: 'Turn off screens 1 hour before bed', type: 'Digital Detox' }] },
+    { id: 8, name: 'Overcommitting to social events', featured: false, techniques: [{ name: 'Practice saying no gracefully', type: 'Boundary Setting' }, { name: 'Schedule "alone time" in your calendar', type: 'Self-care' }] },
+    { id: 9, name: 'Constant worrying about the future', featured: false, techniques: [{ name: 'Practice mindfulness meditation', type: 'Cognitive' }, { name: 'Focus on what you can control', type: 'Mindfulness' }] },
+    { id: 10, name: 'Ignoring physical symptoms of stress', featured: false, techniques: [{ name: 'Schedule a check-up with a doctor', type: 'Health' }, { name: 'Practice body scanning meditation', type: 'Mindfulness' }] },
+    { id: 11, name: 'Relying on junk food for comfort', featured: false, techniques: [{ name: 'Have healthy snacks readily available', type: 'Nutrition' }, { name: 'Mindfully eat your favorite treats', type: 'Mindfulness' }] },
+    { id: 12, name: 'Multitasking too many things at once', featured: false, techniques: [{ name: 'Focus on one task at a time', type: 'Productivity' }, { name: 'Prioritize your to-do list', type: 'Time Management' }] },
+    { id: 13, name: 'Avoiding conflict', featured: false, techniques: [{ name: 'Learn and practice assertive communication', type: 'Communication' }, { name: 'Address issues as they arise', type: 'Behavioral' }] },
+    { id: 14, name: 'Impulsive spending', featured: false, techniques: [{ name: 'Create a budget and track expenses', type: 'Financial' }, { name: 'Wait 24 hours before making a non-essential purchase', type: 'Mindfulness' }] },
+    { id: 15, name: 'Cluttering your living space', featured: false, techniques: [{ name: 'Declutter one small area each day', type: 'Environment' }, { name: 'Follow the "one in, one out" rule', type: 'Organization' }] },
+    { id: 16, name: 'Binge-watching TV or movies', featured: false, techniques: [{ name: 'Set a timer for your screen time', type: 'Digital Detox' }, { name: 'Choose one episode per day', type: 'Moderation' }] },
+    { id: 17, name: 'Holding grudges', featured: false, techniques: [{ name: 'Practice forgiveness meditation', type: 'Cognitive' }, { name: 'Talk to the person directly (if safe)', type: 'Communication' }] },
+    { id: 18, name: 'Perfectionism', featured: true, techniques: [{ name: 'Set realistic goals for yourself', type: 'Cognitive' }, { name: 'Practice self-compassion', type: 'Mindfulness' }] },
+    { id: 19, name: 'Getting upset about minor inconveniences', featured: false, techniques: [{ name: 'Take a deep breath and count to ten', type: 'Mindfulness' }, { name: 'Reframe the situation as a learning experience', type: 'Cognitive' }] },
+    { id: 20, name: 'Talking on the phone while driving', featured: false, techniques: [{ name: 'Put your phone in "Do Not Disturb" mode', type: 'Safety' }, { name: 'Pull over to take important calls', type: 'Mindfulness' }] },
+    { id: 21, name: 'Leaving important tasks to the last minute', featured: false, techniques: [{ name: 'Use a task management app', type: 'Productivity' }, { name: 'Break down large projects into small, manageable steps', type: 'Time Management' }] },
+    { id: 22, name: 'Frequently checking work emails after hours', featured: true, techniques: [{ name: 'Turn off work notifications on your phone', type: 'Digital Detox' }, { name: 'Set a "no-email" rule for evenings', type: 'Boundary Setting' }] },
+    { id: 23, name: 'Comparing yourself to others on social media', featured: false, techniques: [{ name: 'Take a break from social media', type: 'Digital Detox' }, { name: 'Focus on your own growth and progress', type: 'Cognitive' }] },
+    { id: 24, name: 'Constantly seeking external validation', featured: false, techniques: [{ name: 'Practice self-affirmation exercises', type: 'Cognitive' }, { name: 'Celebrate your own successes, no matter how small', type: 'Self-care' }] },
+    { id: 25, name: 'Allowing negative people to drain your energy', featured: false, techniques: [{ name: 'Limit time spent with negative people', type: 'Boundary Setting' }, { name: 'Learn to disengage from toxic conversations', type: 'Communication' }] },
+    { id: 26, name: 'Ignoring financial planning', featured: false, techniques: [{ name: 'Create a simple monthly budget', type: 'Financial' }, { name: 'Automate savings', type: 'Financial' }] },
+    { id: 27, name: 'Putting off doctor’s appointments', featured: false, techniques: [{ name: 'Schedule appointments in advance', type: 'Health' }, { name: 'View healthcare as an investment in yourself', type: 'Cognitive' }] },
+    { id: 28, name: 'Skipping your workout to work more', featured: false, techniques: [{ name: 'Schedule your workout like any other appointment', type: 'Time Management' }, { name: 'Find a workout you genuinely enjoy', type: 'Behavioral' }] },
+    { id: 29, name: 'Letting housework pile up', featured: false, techniques: [{ name: 'Do one small chore each day', type: 'Organization' }, { name: 'Create a simple weekly cleaning schedule', type: 'Planning' }] },
+    { id: 30, name: 'Drinking alcohol to cope with stress', featured: false, techniques: [{ name: 'Find healthy coping mechanisms like exercise', type: 'Behavioral' }, { name: 'Talk to a trusted friend or professional', type: 'Communication' }] },
+    { id: 31, name: 'Overthinking small decisions', featured: false, techniques: [{ name: 'Limit your options to a manageable few', type: 'Cognitive' }, { name: 'Trust your gut instinct more often', type: 'Mindfulness' }] },
+    { id: 32, name: 'Worrying about what others think', featured: false, techniques: [{ name: 'Remember that other people are focused on themselves', type: 'Cognitive' }, { name: 'Live authentically for yourself', type: 'Self-care' }] },
+    { id: 33, name: 'Refusing to ask for help', featured: false, techniques: [{ name: 'Practice asking for small favors first', type: 'Communication' }, { name: 'Recognize that asking for help is a strength, not a weakness', type: 'Cognitive' }] },
+    { id: 34, name: 'Listening to loud, aggressive music when stressed', featured: false, techniques: [{ name: 'Switch to calming instrumental music', type: 'Mindfulness' }, { name: 'Create a playlist specifically for relaxation', type: 'Self-care' }] },
+    { id: 35, name: 'Neglecting self-care activities', featured: false, techniques: [{ name: 'Schedule a self-care activity once a week', type: 'Planning' }, { name: 'Find simple, quick ways to de-stress (e.g., a short walk)', type: 'Behavioral' }] },
+    { id: 36, name: 'Obsessively following the news', featured: false, techniques: [{ name: 'Set a specific time to check the news once a day', type: 'Digital Detox' }, { name: 'Limit news to trusted, factual sources', type: 'Moderation' }] },
+    { id: 37, name: 'Taking on other people’s emotional burdens', featured: false, techniques: [{ name: 'Separate your feelings from others’', type: 'Boundary Setting' }, { name: 'Offer support without taking on the problem', type: 'Communication' }] },
+    { id: 38, name: 'Trying to please everyone', featured: true, techniques: [{ name: 'Prioritize your own needs', type: 'Self-care' }, { name: 'Accept that you can\'t make everyone happy', type: 'Cognitive' }] },
+    { id: 39, name: 'Eating meals while looking at a screen', featured: false, techniques: [{ name: 'Designate mealtime as a no-screen time', type: 'Mindfulness' }, { name: 'Focus on the taste and texture of your food', type: 'Mindfulness' }] },
+    { id: 40, name: 'Hitting the snooze button repeatedly', featured: false, techniques: [{ name: 'Place your alarm clock across the room', type: 'Behavioral' }, { name: 'Go to bed earlier to feel more rested', type: 'Planning' }] },
+    { id: 41, name: 'Bottling up emotions', featured: false, techniques: [{ name: 'Practice journaling or talking to a friend', type: 'Communication' }, { name: 'Find a creative outlet like painting or music', type: 'Self-care' }] },
+    { id: 42, name: 'Ignoring your intuition', featured: false, techniques: [{ name: 'Listen to your gut feelings more often', type: 'Mindfulness' }, { name: 'Take time to reflect before making a decision', type: 'Cognitive' }] },
+    { id: 43, name: 'Rushing through daily activities', featured: false, techniques: [{ name: 'Build in a 10-minute buffer for all appointments', type: 'Time Management' }, { name: 'Practice being present in the moment', type: 'Mindfulness' }] },
+    { id: 44, name: 'Dwelling on past mistakes', featured: false, techniques: [{ name: 'Forgive yourself and move forward', type: 'Cognitive' }, { name: 'Focus on what you learned from the experience', type: 'Mindfulness' }] },
+    { id: 45, name: 'Keeping a disorganized workspace', featured: false, techniques: [{ name: 'Spend 5 minutes tidying your desk each day', type: 'Organization' }, { name: 'Create a system for important documents', type: 'Planning' }] },
+    { id: 46, name: 'Using work as an escape from personal problems', featured: false, techniques: [{ name: 'Confront your problems head-on', type: 'Cognitive' }, { name: 'Seek support from a therapist or counselor', type: 'Communication' }] },
+    { id: 47, name: 'Constant need for control', featured: false, techniques: [{ name: 'Accept that you cannot control everything', type: 'Cognitive' }, { name: 'Focus on managing your response instead of the outcome', type: 'Mindfulness' }] },
+    { id: 48, name: 'Being overly critical of your work', featured: false, techniques: [{ name: 'Get an outside perspective from a trusted colleague', type: 'Communication' }, { name: 'Celebrate milestones and small victories', type: 'Self-care' }] },
+    { id: 49, name: 'Getting lost in thought while on a walk', featured: false, techniques: [{ name: 'Focus on the sensations of walking and your surroundings', type: 'Mindfulness' }, { name: 'Listen to an engaging podcast instead of just music', type: 'Behavioral' }] },
+    { id: 50, name: 'Having an overwhelming to-do list', featured: false, techniques: [{ name: 'Break down your list into "must-do," "should-do," and "can-wait"', type: 'Time Management' }, { name: 'Use a digital planner to organize tasks', type: 'Organization' }] }
+];
+const helpfulHabitsData = [
+    { id: 101, name: 'Mindful breathing exercises', featured: true },
+    { id: 102, name: 'Daily walk or light exercise', featured: true },
+    { id: 103, name: 'Journaling thoughts and feelings', featured: false },
+    { id: 104, name: 'Listening to calming music', featured: true },
+    { id: 105, name: 'Practicing a hobby for 15 minutes', featured: false },
+    { id: 106, name: 'Connecting with a loved one', featured: false },
+    { id: 107, name: 'Spending time in nature', featured: true },
+    { id: 108, name: 'Drinking a glass of water upon waking', featured: false },
+    { id: 109, name: 'Stretching for 5 minutes in the morning', featured: false },
+    { id: 110, name: 'Expressing gratitude for one thing daily', featured: true },
+    { id: 111, name: 'Reading a book for pleasure', featured: false },
+    { id: 112, name: 'Cooking a healthy meal at home', featured: false },
+    { id: 113, name: 'Decluttering a small space', featured: false },
+    { id: 114, name: 'Learning a new skill', featured: false },
+    { id: 115, name: 'Taking a relaxing bath or shower', featured: false },
+    { id: 116, name: 'Practicing yoga or meditation', featured: true },
+    { id: 117, name: 'Doing a digital detox for one hour', featured: false },
+    { id: 118, name: 'Writing down your to-do list for the next day', featured: false },
+    { id: 119, name: 'Setting realistic daily goals', featured: false },
+    { id: 120, name: 'Helping a friend or stranger', featured: false },
+    { id: 121, name: 'Watching a funny movie or show', featured: false },
+    { id: 122, name: 'Playing with a pet', featured: false },
+    { id: 123, name: 'Drawing or sketching', featured: false },
+    { id: 124, name: 'Learning a new language with an app', featured: false },
+    { id: 125, name: 'Practicing mindful eating', featured: false },
+    { id: 126, name: 'Sitting in silence for 5 minutes', featured: false },
+    { id: 127, name: 'Planning a fun activity for the weekend', featured: false },
+    { id: 128, name: 'Making your bed in the morning', featured: false },
+    { id: 129, name: 'Trying a new fruit or vegetable', featured: false },
+    { id: 130, name: 'Taking a 10-minute power nap', featured: false },
+    { id: 131, name: 'Starting a collection of something you love', featured: false },
+    { id: 132, name: 'Writing a letter to a friend', featured: false },
+    { id: 133, name: 'Listening to an inspiring podcast', featured: false },
+    { id: 134, name: 'Working on a puzzle', featured: false },
+    { id: 135, name: 'Organizing your digital files', featured: false },
+    { id: 136, name: 'Taking a break from negative news', featured: false },
+    { id: 137, name: 'Doing a random act of kindness', featured: false },
+    { id: 138, name: 'Cleaning one item of clothing or a small area', featured: false },
+    { id: 139, name: 'Practicing deep breathing before bed', featured: false },
+    { id: 140, name: 'Planning your meals for the week', featured: false },
+    { id: 141, name: 'Listening to an audiobook', featured: false },
+    { id: 142, name: 'Going for a bike ride', featured: false },
+    { id: 143, name: 'Trying a new recipe', featured: false },
+    { id: 144, name: 'Watching the sunrise or sunset', featured: false },
+    { id: 145, name: 'Watering your plants', featured: false },
+    { id: 146, name: 'Doing a puzzle or brain teaser', featured: false },
+    { id: 147, name: 'Writing a positive comment on a social media post', featured: false },
+    { id: 148, name: 'Planning a mini-vacation', featured: false },
+    { id: 149, name: 'Looking at old photos or videos', featured: false },
+    { id: 150, name: 'Listening to the sounds of nature', featured: false }
+];
+
+/* --- DOM & state --- */
+document.addEventListener('DOMContentLoaded', () => {
+    const unhelpfulListEl = document.getElementById('unhelpful-habits-list');
+    const helpfulListEl = document.getElementById('helpful-habits-list');
+    const unhelpfulSearch = document.getElementById('unhelpful-search');
+    const helpfulSearch = document.getElementById('helpful-search');
+    const unhelpfulSuggestionsEl = document.getElementById('unhelpful-suggestions');
+    const unhelpfulSuggestionsContainer = unhelpfulSuggestionsEl.querySelector('.suggestions-container');
+    const selectAllUnhelpfulBtn = document.getElementById('select-all-unhelpful');
+    const clearAllUnhelpfulBtn = document.getElementById('clear-all-unhelpful');
+    const dailyTipBtn = document.getElementById('daily-tip-button');
+    const dailyTipCard = document.getElementById('daily-tip-card');
+    const dailyTipText = document.getElementById('daily-tip-text');
+    const customHabitInput = document.getElementById('custom-habit-input');
+    const addToUnhelpfulBtn = document.getElementById('add-to-unhelpful');
+    const addToHelpfulBtn = document.getElementById('add-to-helpful');
+    const previewBtn = document.getElementById('preview-button');
+    const exportBtn = document.getElementById('export-button');
+    const previewContentEl = document.getElementById('preview-content');
+    const themeToggle = document.getElementById('theme-toggle');
+
+    let selectedUnhelpfulHabits = new Set();
+    let selectedHelpfulHabits = new Set();
+
+    /* Theme init: read from localStorage or system preference */
+    function applyTheme(theme) {
+        if (theme === 'light') {
+            document.body.classList.add('light-theme');
+            // Ensure checkmark contrast variable
+            document.documentElement.style.setProperty('--checkbox-check-color-dark', '#0b0f1a');
+        } else {
+            document.body.classList.remove('light-theme');
+            document.documentElement.style.setProperty('--checkbox-check-color-dark', '#0b0f1a');
+        }
+        // adjust neon heading color to be readable in both
+        const headings = document.querySelectorAll('.neon-heading, .neon-subheading');
+        headings.forEach(h => {
+            // no-op in this version because CSS handles it; kept for future hook
+        });
+    }
+    const savedTheme = localStorage.getItem('habit_builder_theme');
+    if (savedTheme) applyTheme(savedTheme);
+    else {
+        // default: keep dark, but if user system is light prefer light
+        const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        applyTheme(prefersLight ? 'light' : 'dark');
+    }
+
+    themeToggle.addEventListener('click', () => {
+        const isLight = document.body.classList.toggle('light-theme');
+        localStorage.setItem('habit_builder_theme', isLight ? 'light' : 'dark');
+        // small visual feedback
+        themeToggle.textContent = isLight ? 'Switch to Dark' : 'Switch to Light';
+    });
+    // Set initial label
+    themeToggle.textContent = document.body.classList.contains('light-theme') ? 'Switch to Dark' : 'Switch to Light';
+
+    /* --- Render functions --- */
+    function renderHabits(listEl, data, isHelpful = false) {
+        listEl.innerHTML = '';
+        // keep featured items first
+        const featuredHabits = data.filter(h => h.featured);
+        const nonFeaturedHabits = data.filter(h => !h.featured);
+
+        [...featuredHabits, ...nonFeaturedHabits].forEach(habit => {
+            const habitItem = document.createElement('label');
+            habitItem.className = 'habit-item';
+            habitItem.dataset.id = habit.id;
+            habitItem.dataset.name = habit.name;
+
+            // create checkbox
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            // maintain checked state if previously selected
+            checkbox.checked = (isHelpful ? selectedHelpfulHabits : selectedUnhelpfulHabits).has(habit.id);
+
+            // when checkbox changes, update sets
+            checkbox.addEventListener('change', (e) => {
+                const id = parseInt(habitItem.dataset.id, 10);
+                if (isHelpful) {
+                    if (e.target.checked) selectedHelpfulHabits.add(id);
+                    else selectedHelpfulHabits.delete(id);
+                } else {
+                    if (e.target.checked) selectedUnhelpfulHabits.add(id);
+                    else selectedUnhelpfulHabits.delete(id);
+                    updateUnhelpfulSuggestions();
+                }
+            });
+
+            const span = document.createElement('span');
+            span.textContent = habit.name;
+
+            habitItem.appendChild(checkbox);
+            habitItem.appendChild(span);
+            listEl.appendChild(habitItem);
+        });
+    }
+
+    function handleHabitSelection(event, isHelpful) {
+        // older event binding kept for list container change events — no-op now because per-checkbox listener used
+    }
+
+    function updateUnhelpfulSuggestions() {
+        unhelpfulSuggestionsContainer.innerHTML = '';
+        if (selectedUnhelpfulHabits.size === 0) {
+            unhelpfulSuggestionsEl.style.display = 'none';
+            return;
+        }
+
+        unhelpfulSuggestionsEl.style.display = 'block';
+        const selectedData = unhelpfulHabitsData.filter(h => selectedUnhelpfulHabits.has(h.id));
+
+        selectedData.forEach(habit => {
+            const habitBlock = document.createElement('div');
+            habitBlock.className = 'suggestion-block';
+            habitBlock.innerHTML = `<h4 style="margin:6px 0;">For "${escapeHtml(habit.name)}":</h4>`;
+            const ul = document.createElement('ul');
+            habit.techniques.forEach(tech => {
+                const li = document.createElement('li');
+                li.textContent = `${tech.name} (${tech.type})`;
+                ul.appendChild(li);
+            });
+            habitBlock.appendChild(ul);
+            unhelpfulSuggestionsContainer.appendChild(habitBlock);
+        });
+
+        if (selectedUnhelpfulHabits.size > 1) {
+            const combinedBlock = document.createElement('div');
+            combinedBlock.className = 'suggestion-block';
+            combinedBlock.innerHTML = `<h4 style="margin:6px 0;">Combined Strategies:</h4>
+                <ul>
+                    <li>Time-Blocking: Schedule specific blocks for work, social media, and rest to tackle multiple unhelpful habits.</li>
+                    <li>Mindful Pauses: Use a 5-minute breathing exercise whenever you feel the urge to engage in an unhelpful habit.</li>
+                </ul>`;
+            unhelpfulSuggestionsContainer.appendChild(combinedBlock);
+        }
+    }
+
+    function displayDailyTip() {
+        const randomIndex = Math.floor(Math.random() * helpfulHabitsData.length);
+        const tip = helpfulHabitsData[randomIndex];
+        dailyTipText.textContent = `${tip.name}`;
+        dailyTipCard.style.display = 'block';
+    }
+
+    function generatePreviewContent() {
+        // build accessible, readable HTML for preview
+        let content = '<div><h3>Your Stress Reduction Plan</h3>';
+
+        const unhelpfulSelected = unhelpfulHabitsData.filter(h => selectedUnhelpfulHabits.has(h.id));
+        if (unhelpfulSelected.length > 0) {
+            content += '<h4>Unhelpful Habits to Address:</h4><ul>';
+            unhelpfulSelected.forEach(h => {
+                content += `<li><strong>${escapeHtml(h.name)}</strong><ul>`;
+                content += h.techniques.map(t => `<li>${escapeHtml(t.name)} (${escapeHtml(t.type)})</li>`).join('');
+                content += `</ul></li>`;
+            });
+            content += '</ul>';
+        }
+
+        const helpfulSelected = helpfulHabitsData.filter(h => selectedHelpfulHabits.has(h.id));
+        if (helpfulSelected.length > 0) {
+            content += '<h4>Helpful Habits to Adopt:</h4><ul>';
+            helpfulSelected.forEach(h => {
+                content += `<li>${escapeHtml(h.name)}</li>`;
+            });
+            content += '</ul>';
+        }
+
+        if (selectedUnhelpfulHabits.size === 0 && selectedHelpfulHabits.size === 0) {
+            content += '<p><em>No habits selected yet. Choose habits from the lists or add your own.</em></p>';
+        }
+
+        content += '</div>';
+        return content;
+    }
+
+    /* --- Utilities --- */
+    function escapeHtml(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    /* --- Event wiring --- */
+
+    // Render initial lists
+    renderHabits(unhelpfulListEl, unhelpfulHabitsData);
+    renderHabits(helpfulListEl, helpfulHabitsData, true);
+    unhelpfulSuggestionsEl.style.display = 'none';
+
+    // Search handlers
+    unhelpfulSearch.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        const filtered = unhelpfulHabitsData.filter(h => h.name.toLowerCase().includes(query));
+        renderHabits(unhelpfulListEl, filtered);
+    });
+
+    helpfulSearch && helpfulSearch.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        const filtered = helpfulHabitsData.filter(h => h.name.toLowerCase().includes(query));
+        renderHabits(helpfulListEl, filtered, true);
+    });
+
+    // Select all / Clear all (unhelpful)
+    selectAllUnhelpfulBtn.addEventListener('click', () => {
+        unhelpfulListEl.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.checked = true;
+            const id = parseInt(checkbox.closest('.habit-item').dataset.id, 10);
+            selectedUnhelpfulHabits.add(id);
+        });
+        updateUnhelpfulSuggestions();
+    });
+
+    clearAllUnhelpfulBtn.addEventListener('click', () => {
+        unhelpfulListEl.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        selectedUnhelpfulHabits.clear();
+        updateUnhelpfulSuggestions();
+    });
+
+    // Daily tip
+    dailyTipBtn.addEventListener('click', displayDailyTip);
+
+    // Add custom habit to unhelpful
+    addToUnhelpfulBtn.addEventListener('click', () => {
+        const newHabitName = customHabitInput.value.trim();
+        if (newHabitName) {
+            // choose id safely: use current time + length to avoid duplicates
+            const newId = Date.now() % 1000000 + unhelpfulHabitsData.length + 1;
+            unhelpfulHabitsData.push({ id: newId, name: newHabitName, featured: false, techniques: [{ name: 'User-created technique', type: 'Custom' }] });
+            renderHabits(unhelpfulListEl, unhelpfulHabitsData);
+            customHabitInput.value = '';
+        }
+    });
+
+    // Add custom habit to helpful
+    addToHelpfulBtn.addEventListener('click', () => {
+        const newHabitName = customHabitInput.value.trim();
+        if (newHabitName) {
+            const newId = Date.now() % 1000000 + helpfulHabitsData.length + 101;
+            helpfulHabitsData.push({ id: newId, name: newHabitName, featured: false });
+            renderHabits(helpfulListEl, helpfulHabitsData, true);
+            customHabitInput.value = '';
+        }
+    });
+
+    // Preview plan (on-screen)
+    previewBtn.addEventListener('click', () => {
+        previewContentEl.innerHTML = generatePreviewContent();
+        previewContentEl.style.display = 'block';
+        // ensure preview text color is visible based on theme
+        if (document.body.classList.contains('light-theme')) {
+            previewContentEl.style.background = 'rgba(0,0,0,0.02)';
+        } else {
+            previewContentEl.style.background = 'rgba(255,255,255,0.03)';
+        }
+        // Scroll to preview (small UX nicety)
+        previewContentEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+
+    // Export PDF with readable black-on-white styling
+    exportBtn.addEventListener('click', async () => {
+        // ensure preview exists; if not, create preview content temporarily
+        if (!previewContentEl.innerHTML || previewContentEl.style.display === 'none') {
+            previewContentEl.innerHTML = generatePreviewContent();
+            previewContentEl.style.display = 'block';
+        }
+
+        // create a cleaned, printable clone with forced black-on-white styling
+        const clone = document.createElement('div');
+        clone.className = 'pdf-export';
+        // add a title
+        const title = document.createElement('h2');
+        title.textContent = 'Stress Reduction Plan';
+        clone.appendChild(title);
+
+        // copy the generated content (safe HTML insertion because we escape content earlier)
+        // generatePreviewContent already returns escaped content
+        clone.innerHTML += generatePreviewContent();
+
+        // small style adjustments for PDF readability (no neon shadows, clear fonts)
+        clone.style.maxWidth = '800px';
+        clone.style.margin = '10px auto';
+        clone.style.fontSize = '12pt';
+        document.body.appendChild(clone);
+
+        // html2pdf options
+        const opt = {
+            margin:       12/72, // 12pt -> inches
+            filename:     'Stress_Reduction_Plan.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true, allowTaint: true },
+            jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+
+        try {
+            // perform export
+            await html2pdf().set(opt).from(clone).save();
+        } catch (err) {
+            console.error('PDF export failed: ', err);
+            alert('PDF export failed. Try again or check browser console for details.');
+        } finally {
+            // cleanup
+            clone.remove();
+        }
+    });
+
+    // small accessibility: allow Enter to add custom habit when focused on input
+    customHabitInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            // default to adding to helpful if shift pressed, otherwise unhelpful
+            if (e.shiftKey) addToHelpfulBtn.click();
+            else addToUnhelpfulBtn.click();
+        }
+    });
+});
+</script>
+</body>
+</html>
